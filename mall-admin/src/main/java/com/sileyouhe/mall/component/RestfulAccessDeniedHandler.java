@@ -1,4 +1,4 @@
-package com.sileyouhe.mallsecurity.component;
+package com.sileyouhe.mall.component;
 
 
 import cn.hutool.json.JSONUtil;

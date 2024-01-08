@@ -94,6 +94,12 @@
 			<version>${druid.version}</version>
 		</dependency>
 
+		<!--lombok for all subprojects-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
 	</dependencies>
 
 <!--	version control-->

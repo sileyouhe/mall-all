@@ -1,8 +1,7 @@
 package com.sileyouhe.mall.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.sileyouhe.mall.mbg.model.UmsAdmin;
+import com.sileyouhe.mall.mbg.model.UmsPermission;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,27 +11,35 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-@Builder
-public class AdminUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    private List<String> authorityList;
+public class OldAdminUserDetails implements UserDetails {
+
+    private UmsAdmin umsAdmin;
+    private List<UmsPermission> permissionList;
+
+    public OldAdminUserDetails(UmsAdmin umsAdmin, List<UmsPermission> permissionList) {
+        this.umsAdmin = umsAdmin;
+        this.permissionList = permissionList;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorityList.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+
+        return permissionList.stream()
+                .filter(permission -> permission.getValue()!=null)
+                .map(permission -> new SimpleGrantedAuthority(permission.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getPassword() {
-        return this.password;
+
+        return umsAdmin.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.username;
+
+        return umsAdmin.getUsername();
     }
 
     @Override
@@ -42,16 +49,19 @@ public class AdminUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
+
         return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
+
         return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+
+        return umsAdmin.getStatus().equals(1);
     }
 }

@@ -32,7 +32,7 @@ public class PmsBrandController {
     @ApiOperation("List all brands")
     @RequestMapping(value = "/listAll",method = RequestMethod.GET)
     @ResponseBody
-//    @PreAuthorize("hasAuthority('pms:brand:read')")
+    @PreAuthorize("hasAuthority('brand:listAll')")
     public CommonResult<List<PmsBrand>> listAllBrand(){
         return CommonResult.success(brandService.listAllBrand());
     }
@@ -40,7 +40,7 @@ public class PmsBrandController {
     @ApiOperation("List brands by page")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ResponseBody
-//    @PreAuthorize("hasAuthority('pms:brand:read')")
+    @PreAuthorize("hasAuthority('brand:list')")
     public CommonResult<CommonPage<PmsBrand>> listBrandByPage(@RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
                                                   @RequestParam(value = "pageSize",defaultValue = "3") Integer pageSize){
         List<PmsBrand> brandList = brandService.listBrand(pageNum,pageSize);

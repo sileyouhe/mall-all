@@ -56,10 +56,10 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.sileyouhe</groupId>
-            <artifactId>mall-security</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.sileyouhe</groupId>-->
+<!--            <artifactId>mall-security</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.sileyouhe</groupId>
