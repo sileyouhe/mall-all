@@ -14,7 +14,7 @@ public interface UmsAdminService {
     /**
      * get Admin by username
      */
-    AdminUserDetails getAdminByUsername(String username);
+    UmsAdmin getAdminByUsername(String username);
 
     /**
      * register

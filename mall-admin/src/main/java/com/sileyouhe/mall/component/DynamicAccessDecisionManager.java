@@ -30,10 +30,12 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
             System.out.println("当前拥有权限：" + authentication.getAuthorities());
             for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
                 if (needAuthority.trim().equals(grantedAuthority.getAuthority())){
+                    System.out.println("该用户拥有访问权限");
                     return;
                 }
             }
         }
+        System.out.println("该用户没有访问权限");
         throw new AccessDeniedException("Sorry, you cannot access this URL From DynamicAccessDecisionManager.decide");
 
     }

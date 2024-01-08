@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.sileyouhe.mall.dao.UmsAdminRoleRelationDao;
 import com.sileyouhe.mall.dto.AdminUserDetails;
 import com.sileyouhe.mall.mbg.mapper.UmsAdminMapper;
+import com.sileyouhe.mall.mbg.mapper.UmsResourceMapper;
 import com.sileyouhe.mall.mbg.model.UmsAdmin;
 import com.sileyouhe.mall.mbg.model.UmsAdminExample;
 import com.sileyouhe.mall.mbg.model.UmsPermission;
@@ -53,73 +54,87 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     private String tokenHead;
     @Autowired
     private UmsAdminMapper adminMapper;
+
+    @Autowired
+    private UmsResourceMapper resourceMapper;
     @Autowired
     private UmsAdminRoleRelationDao adminRoleRelationDao;
 
 
     // 由于我们还没有实装动态权限管理，因此暂时把用户信息直接写在代码里
-    @PostConstruct
-    private void init(){
-        adminUserDetailsList.add(AdminUserDetails.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("123456"))
-                .authorityList(CollUtil.toList("brand:create","brand:update","brand:delete","brand:list","brand:listAll"))
-                .build());
-        adminUserDetailsList.add(AdminUserDetails.builder()
-                .username("macro")
-                .password(passwordEncoder.encode("123456"))
-                .authorityList(CollUtil.toList("brand:listAll"))
-                .build());
-        resourceList.add(UmsResource.builder()
-                .id(1L)
-                .name("brand:create")
-                .url("/brand/create")
-                .build());
-        resourceList.add(UmsResource.builder()
-                .id(2L)
-                .name("brand:update")
-                .url("/brand/update/**")
-                .build());
-        resourceList.add(UmsResource.builder()
-                .id(3L)
-                .name("brand:delete")
-                .url("/brand/delete/**")
-                .build());
-        resourceList.add(UmsResource.builder()
-                .id(4L)
-                .name("brand:list")
-                .url("/brand/list")
-                .build());
-        resourceList.add(UmsResource.builder()
-                .id(5L)
-                .name("brand:listAll")
-                .url("/brand/listAll")
-                .build());
-    }
+//    @PostConstruct
+//    private void init(){
+//        adminUserDetailsList.add(AdminUserDetails.builder()
+//                .username("admin")
+//                .password(passwordEncoder.encode("123456"))
+//                .authorityList(CollUtil.toList("brand:create","brand:update","brand:delete","brand:list","brand:listAll"))
+//                .build());
+//        adminUserDetailsList.add(AdminUserDetails.builder()
+//                .username("macro")
+//                .password(passwordEncoder.encode("123456"))
+//                .authorityList(CollUtil.toList("brand:listAll"))
+//                .build());
+//        resourceList.add(UmsResource.builder()
+//                .id(1L)
+//                .name("brand:create")
+//                .url("/brand/create")
+//                .build());
+//        resourceList.add(UmsResource.builder()
+//                .id(2L)
+//                .name("brand:update")
+//                .url("/brand/update/**")
+//                .build());
+//        resourceList.add(UmsResource.builder()
+//                .id(3L)
+//                .name("brand:delete")
+//                .url("/brand/delete/**")
+//                .build());
+//        resourceList.add(UmsResource.builder()
+//                .id(4L)
+//                .name("brand:list")
+//                .url("/brand/list")
+//                .build());
+//        resourceList.add(UmsResource.builder()
+//                .id(5L)
+//                .name("brand:listAll")
+//                .url("/brand/listAll")
+//                .build());
+//    }
     @Override
-    public AdminUserDetails getAdminByUsername(String username) {
-//        UmsAdminExample example = new UmsAdminExample();
-//        example.createCriteria().andUsernameEqualTo(username);
-//        List<UmsAdmin> adminList = adminMapper.selectByExample(example);
-//        if (adminList != null && adminList.size() > 0){
-//            return adminList.get(0);
+    public UmsAdmin getAdminByUsername(String username) {
+
+        // 真实数据
+        UmsAdminExample example = new UmsAdminExample();
+        example.createCriteria().andUsernameEqualTo(username);
+        List<UmsAdmin> adminList = adminMapper.selectByExample(example);
+        if (adminList != null && adminList.size() > 0){
+            return adminList.get(0);
+        }
+        return null;
+
+         // 假数据
+//        List<AdminUserDetails> findList = adminUserDetailsList.stream().filter(item -> item.getUsername().equals(username)).collect(Collectors.toList());
+//        if(CollUtil.isNotEmpty(findList)){
+//            return findList.get(0);
 //        }
 //        return null;
-        List<AdminUserDetails> findList = adminUserDetailsList.stream().filter(item -> item.getUsername().equals(username)).collect(Collectors.toList());
-        if(CollUtil.isNotEmpty(findList)){
-            return findList.get(0);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        //获取用户信息
+        UmsAdmin admin = getAdminByUsername(username);
+        if (admin != null) {
+            List<UmsResource> resourceList = getResourceList(admin.getId());
+            return new AdminUserDetails(admin,resourceList);
+
         }
         return null;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        return null;
-    }
-
-    @Override
     public List<UmsResource> getResourceList(Long adminId) {
-        return null;
+        return resourceMapper.getResourceList(adminId);
     }
 
     @Override
@@ -146,7 +161,9 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     public String login(String username, String password) {
         String token = null;
         try {
-            UserDetails userDetails = getAdminByUsername(username);
+            UserDetails userDetails = loadUserByUsername(username);
+//            System.out.println("数据库里取出的用户是：" + userDetails);
+//            System.out.println("用户的权限列表：" + userDetails.getAuthorities());
             if (!passwordEncoder.matches(password,userDetails.getPassword())){
                 throw new BadCredentialsException("incorrect password");
             }

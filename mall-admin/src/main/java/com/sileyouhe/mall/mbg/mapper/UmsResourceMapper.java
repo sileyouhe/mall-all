@@ -27,4 +27,16 @@ public interface UmsResourceMapper {
     int updateByPrimaryKeySelective(UmsResource row);
 
     int updateByPrimaryKey(UmsResource row);
+
+    /**
+     * 自定义方法
+     * 获取用户所有可访问资源
+     */
+    List<UmsResource> getResourceList(@Param("adminId") Long adminId);
+
+    /**
+     * 自定义方法
+     * 根据角色ID获取资源
+     */
+    List<UmsResource> getResourceListByRoleId(@Param("roleId") Long roleId);
 }

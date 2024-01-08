@@ -34,7 +34,7 @@ public class MallSecurityConfig{
     public UserDetailsService userDetailsService() {
         //获取登录用户信息
         return username -> {
-            AdminUserDetails admin = adminService.getAdminByUsername(username);
+            UserDetails admin = adminService.loadUserByUsername(username);
             if (admin != null) {
                 return admin;
             }

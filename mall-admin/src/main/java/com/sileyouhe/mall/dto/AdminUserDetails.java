@@ -1,5 +1,7 @@
 package com.sileyouhe.mall.dto;
 
+import com.sileyouhe.mall.mbg.model.UmsAdmin;
+import com.sileyouhe.mall.mbg.model.UmsResource;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,23 +18,29 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 @Builder
 public class AdminUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    private List<String> authorityList;
+    private UmsAdmin umsAdmin;
+    private List<UmsResource> resourceList;
+    public AdminUserDetails(UmsAdmin umsAdmin, List<UmsResource> resourceList) {
+        this.umsAdmin = umsAdmin;
+        this.resourceList = resourceList;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorityList.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        // 返回当前用户拥有的资源列表，以(资源id,资源name)为一个单位
+        return resourceList.stream()
+                .map(resource ->new SimpleGrantedAuthority(resource.getId()+":"+resource.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getPassword() {
-        return this.password;
+        return umsAdmin.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.username;
+        return umsAdmin.getUsername();
     }
 
     @Override
